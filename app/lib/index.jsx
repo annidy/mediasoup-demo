@@ -73,7 +73,7 @@ async function run()
 	const consume = urlParser.query.consume !== 'false';
 	const datachannel = urlParser.query.datachannel !== 'false';
 	const forceVP8 = urlParser.query.forceVP8 === 'true';
-	const forceH264 = urlParser.query.forceH264 === 'true';
+	const forceH264 = urlParser.query.forceH264 !== 'false';
 	const forceVP9 = urlParser.query.forceVP9 === 'true';
 	const enableWebcamLayers = urlParser.query.enableWebcamLayers !== 'false';
 	const enableSharingLayers = urlParser.query.enableSharingLayers !== 'false';

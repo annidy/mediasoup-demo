@@ -84,6 +84,10 @@ class Stats extends React.Component
 							</Choose>
 						</div>
 
+						<div className='info'>
+							<span>{peerId}</span>
+						</div>
+						
 						<div className='list'>
 							<If condition={sendTransportRemoteStats || sendTransportLocalStats}>
 								<p>

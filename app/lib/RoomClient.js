@@ -1038,7 +1038,7 @@ export default class RoomClient
 			else if (this._forceH264)
 			{
 				codec = this._mediasoupDevice.rtpCapabilities.codecs
-					.find((c) => c.mimeType.toLowerCase() === 'video/h264');
+					.find((c) => c.mimeType.toLowerCase() === 'video/h264' && c.preferredPayloadType == 107 );
 
 				if (!codec)
 				{
@@ -1113,13 +1113,14 @@ export default class RoomClient
 					}
 				}
 			}
-
+			let appData = { type:"camera-track" }
 			this._webcamProducer = await this._sendTransport.produce(
 				{
 					track,
 					encodings,
 					codecOptions,
-					codec
+					codec,
+					appData
 				});
 
 			if (this._e2eKey && e2e.isSupported())

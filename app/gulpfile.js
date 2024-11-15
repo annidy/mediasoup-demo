@@ -68,6 +68,7 @@ const OUTPUT_DIR = '../server/public';
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 gutil.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+gutil.log(`ROOM_URL: ${process.env.ROOM_URL}`);
 
 function logError(error)
 {
@@ -97,6 +98,7 @@ function bundle(options)
 		.transform(envify(
 			{
 				NODE_ENV : process.env.NODE_ENV,
+				ROOM_URL : process.env.ROOM_URL,
 				_        : 'purge'
 			}));
 

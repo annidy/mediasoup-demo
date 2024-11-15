@@ -45,6 +45,7 @@ class Room extends React.Component
 						<p className='text'><span className='label'>server:&nbsp;&nbsp;</span>{room.mediasoupVersion}</p>
 						<p className='text'><span className='label'>client:&nbsp;&nbsp;</span>{mediasoupClientVersion}</p>
 						<p className='text'><span className='label'>handler:&nbsp;&nbsp;</span>{room.mediasoupClientHandler}</p>
+						<p className='text'><span className='label'>roomUrl:&nbsp;&nbsp;</span>{process.env.ROOM_URL}</p>
 					</div>
 
 					<div className='room-link-wrapper'>

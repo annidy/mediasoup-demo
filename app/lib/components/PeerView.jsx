@@ -31,6 +31,7 @@ export default class PeerView extends React.Component
 			videoResolutionWidth  : null,
 			videoResolutionHeight : null,
 			videoCanPlay          : false,
+			pipVideoCanPlay          : false,
 			videoElemPaused       : false,
 			maxSpatialLayer       : null
 		};
@@ -42,6 +43,7 @@ export default class PeerView extends React.Component
 		// Latest received video track.
 		// @type {MediaStreamTrack}
 		this._videoTrack = null;
+		this._pipVideoTrack = null;
 
 		// Hark instance.
 		// @type {Object}
@@ -92,6 +94,7 @@ export default class PeerView extends React.Component
 			videoResolutionWidth,
 			videoResolutionHeight,
 			videoCanPlay,
+			pipVideoCanPlay,
 			videoElemPaused,
 			maxSpatialLayer
 		} = this.state;
@@ -449,6 +452,21 @@ export default class PeerView extends React.Component
 					controls={false}
 				/>
 
+				<video
+					ref='pipVideoElem'
+					className={classnames('pip', {
+						'is-me'         : isMe,
+						hidden          : !videoVisible || !pipVideoCanPlay,
+						'network-error' : (
+							videoVisible && videoMultiLayer && consumerCurrentSpatialLayer === null
+						)
+					})}
+					autoPlay
+					playsInline
+					muted
+					controls={false}
+				/>
+
 				<audio
 					ref='audioElem'
 					autoPlay
@@ -480,9 +498,9 @@ export default class PeerView extends React.Component
 
 	componentDidMount()
 	{
-		const { audioTrack, videoTrack } = this.props;
+		const { audioTrack, videoTrack, pipVideoTrack } = this.props;
 
-		this._setTracks(audioTrack, videoTrack);
+		this._setTracks(audioTrack, videoTrack, pipVideoTrack);
 	}
 
 	componentWillUnmount()
@@ -509,6 +527,7 @@ export default class PeerView extends React.Component
 			isMe,
 			audioTrack,
 			videoTrack,
+			pipVideoTrack,
 			videoRtpParameters
 		} = this.props;
 
@@ -526,18 +545,19 @@ export default class PeerView extends React.Component
 			this.setState({ maxSpatialLayer: null });
 		}
 
-		this._setTracks(audioTrack, videoTrack);
+		this._setTracks(audioTrack, videoTrack, pipVideoTrack);
 	}
 
-	_setTracks(audioTrack, videoTrack)
+	_setTracks(audioTrack, videoTrack, pipVideoTrack)
 	{
 		const { faceDetection } = this.props;
 
-		if (this._audioTrack === audioTrack && this._videoTrack === videoTrack)
+		if (this._audioTrack === audioTrack && this._videoTrack === videoTrack && this._pipVideoTrack === pipVideoTrack)
 			return;
 
 		this._audioTrack = audioTrack;
 		this._videoTrack = videoTrack;
+		this._pipVideoTrack = pipVideoTrack;
 
 		if (this._hark)
 			this._hark.stop();
@@ -547,7 +567,7 @@ export default class PeerView extends React.Component
 		if (faceDetection)
 			this._stopFaceDetection();
 
-		const { audioElem, videoElem } = this.refs;
+		const { audioElem, videoElem, pipVideoElem } = this.refs;
 
 		if (audioTrack)
 		{
@@ -596,6 +616,32 @@ export default class PeerView extends React.Component
 		else
 		{
 			videoElem.srcObject = null;
+		}
+
+		if (pipVideoTrack) 
+		{
+			const stream = new MediaStream;
+
+			stream.addTrack(pipVideoTrack);
+
+			pipVideoElem.srcObject = stream;
+
+			pipVideoElem.oncanplay = () => this.setState({ pipVideoCanPlay: true });
+
+			pipVideoElem.onplay = () =>
+			{
+			};
+
+			pipVideoElem.onpause = () => {
+
+			};
+
+			pipVideoElem.play()
+				.catch((error) => logger.warn('pipVideoElem.play() failed:%o', error));
+		}
+		else
+		{
+			pipVideoElem.srcObject = null;
 		}
 	}
 
@@ -777,6 +823,7 @@ PeerView.propTypes =
 	consumerPriority               : PropTypes.number,
 	audioTrack                     : PropTypes.any,
 	videoTrack                     : PropTypes.any,
+	pipVideoTrack                  : PropTypes.any,
 	audioMuted                     : PropTypes.bool,
 	videoVisible                   : PropTypes.bool.isRequired,
 	videoMultiLayer                : PropTypes.bool,

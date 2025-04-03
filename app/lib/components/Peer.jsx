@@ -13,6 +13,7 @@ const Peer = (props) =>
 		peer,
 		audioConsumer,
 		videoConsumer,
+		pipVideoConsumer,
 		audioMuted,
 		faceDetection,
 		onSetStatsPeerId
@@ -65,6 +66,7 @@ const Peer = (props) =>
 				consumerPriority={videoConsumer ? videoConsumer.priority : null}
 				audioTrack={audioConsumer ? audioConsumer.track : null}
 				videoTrack={videoConsumer ? videoConsumer.track : null}
+				pipVideoTrack={pipVideoConsumer ? pipVideoConsumer.track : null}
 				audioMuted={audioMuted}
 				videoVisible={videoVisible}
 				videoMultiLayer={videoConsumer && videoConsumer.type !== 'simple'}
@@ -98,6 +100,7 @@ Peer.propTypes =
 	peer             : appPropTypes.Peer.isRequired,
 	audioConsumer    : appPropTypes.Consumer,
 	videoConsumer    : appPropTypes.Consumer,
+	pipVideoConsumer : appPropTypes.Consumer,
 	audioMuted       : PropTypes.bool,
 	faceDetection    : PropTypes.bool.isRequired,
 	onSetStatsPeerId : PropTypes.func.isRequired
@@ -113,11 +116,13 @@ const mapStateToProps = (state, { id }) =>
 		consumersArray.find((consumer) => consumer.track.kind === 'audio');
 	const videoConsumer =
 		consumersArray.find((consumer) => consumer.track.kind === 'video');
-
+	const pipVideoConsumer =
+		consumersArray.find((consumer) => consumer.track.kind === 'video' && consumer !== videoConsumer);
 	return {
 		peer,
 		audioConsumer,
 		videoConsumer,
+		pipVideoConsumer,
 		audioMuted    : me.audioMuted,
 		faceDetection : state.room.faceDetection
 	};
